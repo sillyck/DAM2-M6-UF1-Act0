@@ -7,6 +7,9 @@ import ioc.dam.m6.exemples.gestiofitxers.TipusOrdre;
 
 public class GestioFitxersImpl implements GestioFitxers{
 
+	private int files=0;
+	private int columnes = 3;
+	
 	private Object[][] contingut;
 	private File carpetaDeTreball = null;
 	
@@ -17,12 +20,36 @@ public class GestioFitxersImpl implements GestioFitxers{
 	}
 
 	public void actualitza() {	
-		throw new UnsupportedOperationException("Not supported yet.");
+		String[] fitxers = carpetaDeTreball.list(); //obtenir els noms
+		
+		//Calcular el nombre de files necessaries
+		files = fitxers.length / columnes;
+		if(files*columnes < fitxers.length) {
+			files++; //si hi ha residu necessitem una fila mes
+		}
+		
+		//dimensionar la matriu de contingut d'acord als resultats
+		contingut = new String[files][columnes];
+		
+		//Omplir el contingut amb els noms obtinguts
+		for(int i=0; i<columnes; i++) {
+			for(int j=0; j<files; j++) {
+				int ind = j*columnes+i;
+				if(ind<fitxers.length) {
+					contingut[j][i] = fitxers[ind];
+				}else {
+					contingut[j][i]="";
+				}
+			}
+		}
 	}
 	
 	@Override
 	public void amunt() {
-		throw new UnsupportedOperationException("Not supported yet.");
+		if(carpetaDeTreball.getParentFile()!=null) {
+			carpetaDeTreball = carpetaDeTreball.getParentFile();
+			actualitza();
+		}
 		
 	}
 
@@ -45,9 +72,23 @@ public class GestioFitxersImpl implements GestioFitxers{
 	}
 
 	@Override
-	public void entraA(String arg0) throws GestioFitxersException {
-		throw new UnsupportedOperationException("Not supported yet.");
+	public void entraA(String nomCarpeta) throws GestioFitxersException {
+		File file = new File(carpetaDeTreball, nomCarpeta);
 		
+		//es controla que el nom correspongui a una carpeta existent
+		if (!file.isDirectory()) {
+			throw new GestioFitxersException("Error. S'esperava un directori però "+ file.getAbsolutePath()+" no és un directori");
+		}
+		
+		//es controla que es tinguin permisos per llegir la carpeta
+		if(!file.canRead()) {
+			throw new GestioFitxersException("Alerta. No podeu accedir a " + file.getAbsolutePath() + ". No teniu prou permisos");
+		}
+		//nova assignació de la carpeta de treball
+		carpetaDeTreball = file;
+				
+		//es requereix actualitzar el contingut
+		actualitza();
 	}
 
 	@Override
@@ -70,20 +111,17 @@ public class GestioFitxersImpl implements GestioFitxers{
 
 	@Override
 	public String getAdrecaCarpeta() {
-		throw new UnsupportedOperationException("Not supported yet.");
-		//return null;
+		return carpetaDeTreball.getAbsolutePath();
 	}
 
 	@Override
 	public int getColumnes() {
-		throw new UnsupportedOperationException("Not supported yet.");
-		//return 0;
+		return columnes;
 	}
 
 	@Override
 	public Object[][] getContingut() {
-		throw new UnsupportedOperationException("Not supported yet.");
-		//return null;
+		return contingut;
 	}
 
 	@Override
@@ -100,8 +138,7 @@ public class GestioFitxersImpl implements GestioFitxers{
 
 	@Override
 	public int getFiles() {
-		throw new UnsupportedOperationException("Not supported yet.");
-		//return 0;
+		return files;
 	}
 
 	@Override
@@ -124,8 +161,7 @@ public class GestioFitxersImpl implements GestioFitxers{
 
 	@Override
 	public String getNomCarpeta() {
-		throw new UnsupportedOperationException("Not supported yet.");
-		//return null;
+		return carpetaDeTreball.getAbsolutePath();
 	}
 
 	@Override
@@ -165,14 +201,29 @@ public class GestioFitxersImpl implements GestioFitxers{
 	}
 
 	@Override
-	public void setAdrecaCarpeta(String arg0) throws GestioFitxersException {
-		throw new UnsupportedOperationException("Not supported yet.");
+	public void setAdrecaCarpeta(String adreca) throws GestioFitxersException {
+		File file = new File(adreca);
+		//es controla que l'adreça passada existeixi i sigui un directori
 		
+		if (!file.isDirectory()) {
+			throw new GestioFitxersException("Error. S'esperava un directori però "+ file.getAbsolutePath()+" no és un directori");
+		}
+		
+		//es controla que es tinguin permisos per llegir la carpeta
+		if(!file.canRead()) {
+			throw new GestioFitxersException("Alerta. No podeu accedir a " + file.getAbsolutePath() + ". No teniu prou permisos");
+		}
+		
+		//nova assignació de la carpeta de treball
+		carpetaDeTreball = file;
+		
+		//es requereix actualitzar el contingut
+		actualitza();
 	}
 
 	@Override
-	public void setColumnes(int arg0) {
-		throw new UnsupportedOperationException("Not supported yet.");
+	public void setColumnes(int columnes) {
+		this.columnes = columnes;
 		
 	}
 
