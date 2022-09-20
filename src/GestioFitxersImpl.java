@@ -1,5 +1,8 @@
 import java.io.File;
+import java.io.IOException;
+import java.util.Date;
 
+import ioc.dam.m6.exemples.gestiofitxers.ByteFormat;
 import ioc.dam.m6.exemples.gestiofitxers.FormatVistes;
 import ioc.dam.m6.exemples.gestiofitxers.GestioFitxers;
 import ioc.dam.m6.exemples.gestiofitxers.GestioFitxersException;
@@ -20,7 +23,7 @@ public class GestioFitxersImpl implements GestioFitxers{
 	}
 
 	public void actualitza() {	
-		String[] fitxers = carpetaDeTreball.list(); //obtenir els noms
+		String[] fitxers = carpetaDeTreball.list(new FiltreFitxersOcults()); //obtenir els noms
 		
 		//Calcular el nombre de files necessaries
 		files = fitxers.length / columnes;
@@ -148,9 +151,83 @@ public class GestioFitxersImpl implements GestioFitxers{
 	}
 
 	@Override
-	public String getInformacio(String arg0) throws GestioFitxersException {
-		throw new UnsupportedOperationException("Not supported yet.");
-		//return null;
+	public String getInformacio(String nom) throws GestioFitxersException {
+		ByteFormat byteFormat = new ByteFormat("#,##.0", ByteFormat.BYTE);
+		StringBuilder strBuilder = new StringBuilder();
+		File file = new File(carpetaDeTreball, nom);
+		
+		//Es controla que existeixi l'element a analitzar
+		if(!file.exists()) {
+			throw new GestioFitxersException("Error. No es pot obtenir informació de " + nom + ", no existeix.");
+		}
+		
+		//S'escriu el titol
+		strBuilder.append("INFORMACIÓ DEL SISTEMA);");
+		strBuilder.append("\n\n");
+		
+		//S'afegeix un nom
+		strBuilder.append("Nom: ");
+		strBuilder.append(nom);
+		strBuilder.append("\n");
+		
+		//El tipus de carpeta o fitxer
+		strBuilder.append("Tipus: ");
+		if(file.isFile()) {
+			//es fitxer
+			strBuilder.append("fitxer");
+			strBuilder.append("\n");
+			//S'escriu la mida
+			strBuilder.append("Mida: ");
+			strBuilder.append(byteFormat.format(file.length()));
+			strBuilder.append("\n");
+		}else {
+			//es carpeta
+			strBuilder.append("carpeta");
+			strBuilder.append("\n");
+			
+			//S'indica el nombre d'elements continguts
+			strBuilder.append("Contingut: ");
+			strBuilder.append(file.list().length);
+			strBuilder.append(" entrades\n");
+		}
+		//Afegim la ubicació
+		strBuilder.append("Ubicació: ");
+		/*
+		 * Cal posar el try catch perque si
+		 */
+		try { 
+			strBuilder.append(file.getCanonicalPath());
+		} catch (IOException ex) {/*Mai es produira aquest error*/}
+		strBuilder.append("\n");
+		
+		//Afegim la data de la ultima modificació
+		strBuilder.append("Ultima modicicació: ");
+		Date date = new Date(file.lastModified());
+		strBuilder.append(date.toString());
+		strBuilder.append("\n");
+		
+		//Indiquem si es o no un fitxer ocult
+		strBuilder.append("Ocult: ");
+		strBuilder.append(file.isHidden()?"Si":"No");
+		strBuilder.append("\n");
+		
+		if(file.isDirectory()) {
+			//Mostrem l'espai lliure
+			strBuilder.append("Espai lliure: ");
+			strBuilder.append(byteFormat.format(file.getFreeSpace()));
+			strBuilder.append("\n");
+			
+			//Mostrem l'espai disponible
+			strBuilder.append("Espai disponible: ");
+			strBuilder.append(byteFormat.format(file.getUsableSpace()));
+			strBuilder.append("\n");
+			
+			//Mostrem l'espai total
+			strBuilder.append("Espai total: ");
+			strBuilder.append(byteFormat.format(file.getTotalSpace()));
+			strBuilder.append("\n");
+		}
+		return strBuilder.toString();
 	}
 
 	@Override
