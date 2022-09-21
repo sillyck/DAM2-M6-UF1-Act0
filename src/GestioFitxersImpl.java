@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
 
 import ioc.dam.m6.exemples.gestiofitxers.ByteFormat;
@@ -16,19 +17,38 @@ public class GestioFitxersImpl implements GestioFitxers{
 	private Object[][] contingut;
 	private File carpetaDeTreball = null;
 	
+	private TipusOrdre ordenat;
+	private boolean mostrarOcults;
+	private final FiltreFitxersOcults filtreFitxersOcults = new FiltreFitxersOcults();
+		
 	//Contructor
 	public GestioFitxersImpl() {
 		carpetaDeTreball = File.listRoots()[0];
 		actualitza();
 	}
 
-	public void actualitza() {	
-		String[] fitxers = carpetaDeTreball.list(new FiltreFitxersOcults()); //obtenir els noms
+	public void actualitza() {
+		
+		String[] fitxers;  //obtenir els noms
+		
+		if(mostrarOcults) {
+			fitxers = carpetaDeTreball.list();
+		}else {
+			fitxers = carpetaDeTreball.list(filtreFitxersOcults);
+		}
+		
+		//columnes = columnesBase;
 		
 		//Calcular el nombre de files necessaries
 		files = fitxers.length / columnes;
 		if(files*columnes < fitxers.length) {
 			files++; //si hi ha residu necessitem una fila mes
+		}
+		
+		
+		//Ordenació del contingut
+		if(ordenat==TipusOrdre.NOM) {
+			Arrays.sort(fitxers, String.CASE_INSENSITIVE_ORDER);
 		}
 		
 		//dimensionar la matriu de contingut d'acord als resultats
@@ -232,9 +252,9 @@ public class GestioFitxersImpl implements GestioFitxers{
 
 	@Override
 	public boolean getMostrarOcults() {
-		throw new UnsupportedOperationException("Not supported yet.");
-		//return false;
+		return mostrarOcults;
 	}
+	
 
 	@Override
 	public String getNomCarpeta() {
@@ -243,8 +263,7 @@ public class GestioFitxersImpl implements GestioFitxers{
 
 	@Override
 	public TipusOrdre getOrdenat() {
-		throw new UnsupportedOperationException("Not supported yet.");
-		//return null;
+		return ordenat;
 	}
 
 	@Override
@@ -329,15 +348,15 @@ public class GestioFitxersImpl implements GestioFitxers{
 	}
 
 	@Override
-	public void setMostrarOcults(boolean arg0) {
-		throw new UnsupportedOperationException("Not supported yet.");
-		
+	public void setMostrarOcults(boolean ocults) {
+		this.mostrarOcults=ocults;
+		actualitza();
 	}
 
 	@Override
-	public void setOrdenat(TipusOrdre arg0) {
-		throw new UnsupportedOperationException("Not supported yet.");
-		
+	public void setOrdenat(TipusOrdre ordenat) {
+		this.ordenat = ordenat;
+		actualitza();
 	}
 
 	@Override
@@ -345,5 +364,7 @@ public class GestioFitxersImpl implements GestioFitxers{
 		throw new UnsupportedOperationException("Not supported yet.");
 		
 	}
+	
+	
 
 }
