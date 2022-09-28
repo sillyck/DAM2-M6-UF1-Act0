@@ -6,15 +6,7 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/Jordi/Desktop/DAM/M6/UF1/Recursos/GestioFitxersBase.jar">
-		<attributes>
-			<attribute name="module" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/Jordi/Desktop/DAM/M6/UF1/Recursos/GestioFitxersIGU.jar">
-		<attributes>
-			<attribute name="module" value="true"/>
-		</attributes>
-	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/Jordi/Desktop/DAM/M6/UF1/Recursos/GestioFitxersBase.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Jordi/Desktop/DAM/M6/UF1/Recursos/GestioFitxersIGU.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

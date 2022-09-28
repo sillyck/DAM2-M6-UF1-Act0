@@ -8,5 +8,5 @@ public class FiltreFitxersOcults implements FilenameFilter{
 		File file = new File(pfile, string);
 		return !file.isHidden();
 	}
-
+	
 }
